@@ -7,6 +7,7 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { authService } from '../services/auth/auth.service'
+import { eventBus } from '../services/eventBus.service'
 
 const router = useRouter()
 
@@ -15,6 +16,7 @@ const router = useRouter()
       await authService.getToken()
       // Get token and update auth state
       if (authService.getIsAuthenticated()) {
+        eventBus.publish('login')
         await authService.getToken()
         console.log('Authentication successful')
         router.replace('/')

@@ -1,5 +1,7 @@
 import { ref } from 'vue'
 import { eventBus } from '../eventBus.service'
+import axios from 'axios'
+import { AUTH_BE_CONFIG } from '../../config/auth/auth.be.config'
 
 class AuthService {
   constructor() {
@@ -11,6 +13,7 @@ class AuthService {
 
     eventBus.subscribe('login', async () => {
       await this.getToken()
+      await this.signIn()
     })
   }
 
@@ -50,6 +53,38 @@ class AuthService {
       return token
     } catch (error) {
       console.error('Error getting access token:', error)
+      throw error
+    }
+  }
+
+  async signIn() {
+    console.log('signIn')
+    const apiClient = axios.create({
+      baseURL: AUTH_BE_CONFIG.baseURL,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    apiClient.interceptors.request.use(async (config) => {
+      const token = await this.getToken()
+      config.headers.Authorization = `Bearer ${token}`
+      return config
+    })
+
+    try {
+      const response = await apiClient.post(AUTH_BE_CONFIG.endpoints.signin)
+
+      if (!response.data || response.status != 200) {
+        throw new Error('Sign in failed')
+      }
+
+      console.log('signIn response:', response)
+      return response
+    } catch (error) {
+      console.error('Error signing in:', error)
+      this.clearToken()
+      window.auth0Instance.logout({ returnTo: window.location.origin })
       throw error
     }
   }

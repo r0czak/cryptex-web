@@ -14,12 +14,6 @@ export const authGuard = async (to, from, next) => {
     return
   }
 
-  console.log('authGuard', authService.getIsAuthenticated())
-  console.log('authGuard', authService.getToken())
-  setTimeout(() => {
-    console.log('authGuard2', authService.getIsAuthenticated())
-  }, 1000)
-
   // Handle authenticated users trying to access login page
   if (to.path === '/login' && authService.getIsAuthenticated()) {
     try {
@@ -30,11 +24,11 @@ export const authGuard = async (to, from, next) => {
       } else if (permissions.includes('write:user_role')) {
         next('/user-dashboard')
       } else {
-        next('/')
+        next('/login')
       }
     } catch (error) {
       console.error('Auth guard error:', error)
-      next('/')
+      next('/login')
     }
     return
   }
@@ -53,7 +47,7 @@ export const authGuard = async (to, from, next) => {
       if (hasPermission(permissions, to.meta.permissions)) {
         next()
       } else {
-        next('/')
+        next('/login')
       }
     } catch (error) {
       console.error('Auth guard error:', error)
@@ -62,7 +56,19 @@ export const authGuard = async (to, from, next) => {
     return
   }
 
-  // Allow access to all other routes
+  // Allow access to login page when not authenticated
+  if (to.path === '/login' && !authService.getIsAuthenticated()) {
+    next()
+    return
+  }
+
+  // For all other routes, redirect to login if not authenticated
+  if (!authService.getIsAuthenticated()) {
+    next('/login')
+    return
+  }
+
+  // Allow access to all other routes for authenticated users
   next()
 }
 

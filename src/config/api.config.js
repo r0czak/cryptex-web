@@ -3,6 +3,6 @@ export const API_CONFIG = {
   endpoints: {
     public: import.meta.env.VITE_SPRING_PUBLIC_API,
     private: import.meta.env.VITE_SPRING_PRIVATE_API,
-    admin: import.meta.env.VITE_SPRING_ADMIN_API
-  }
-} 
+    admin: import.meta.env.VITE_SPRING_ADMIN_API,
+  },
+}
