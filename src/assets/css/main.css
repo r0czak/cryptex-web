@@ -3,3 +3,6 @@
 @import './components/_navbar.css';
 @import './components/layouts/_content-layout.css';
 @import './components/layouts/_page-layout.css';
+@import './components/wallet/_wallet-popup.css';
+@import './components/wallet/_balance-list-item.css';
+@import './components/wallet/_wallet-page-layout.css';

@@ -17,16 +17,15 @@
 <script setup>
 import { ref } from 'vue'
 import { useAuth0 } from '@auth0/auth0-vue'
-import { API_CONFIG } from '../../config/api.config'
+import { apiService } from '../../services/api.service'
 
 const apiMessage = ref('')
-const { user, isLoading, getAccessTokenSilently, logout } = useAuth0()
+const { user, isLoading, logout } = useAuth0()
 
 const callPublicApi = async () => {
   try {
-    const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.public}`)
-    const data = await response.json()
-    apiMessage.value = data.message
+    const response = await apiService.user.getProfile()
+    apiMessage.value = response.data.message
   } catch (error) {
     apiMessage.value = 'Error calling public API'
     console.error(error)
@@ -35,20 +34,8 @@ const callPublicApi = async () => {
 
 const callPrivateApi = async () => {
   try {
-    const token = await getAccessTokenSilently()
-    const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.private}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    })
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const data = await response.json()
-    apiMessage.value = data.message
+    const response = await apiService.user.getSettings()
+    apiMessage.value = response.data.message
   } catch (error) {
     console.error('Private API Error:', error)
     apiMessage.value = `Error calling private API: ${error.message}`

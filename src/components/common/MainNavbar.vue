@@ -13,7 +13,7 @@
     <div class="menu" :class="{ 'menu-active': isMenuOpen }">
       <router-link to="/trades" class="menu-item" @click="closeMenu">Trades</router-link>
       <router-link to="/orders" class="menu-item" @click="closeMenu">Orders</router-link>
-      <router-link to="/wallets" class="menu-item" @click="closeMenu">Wallets</router-link>
+      <router-link to="/crypto-wallets" class="menu-item" @click="closeMenu">Wallets</router-link>
       <router-link v-if="hasAdminRole" to="/users" class="menu-item" @click="closeMenu">Users</router-link>
     </div>
 

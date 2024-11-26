@@ -1,8 +1,39 @@
 export const API_CONFIG = {
   baseURL: import.meta.env.VITE_SPRING_BASE_API,
   endpoints: {
-    public: import.meta.env.VITE_SPRING_PUBLIC_API,
-    private: import.meta.env.VITE_SPRING_PRIVATE_API,
-    admin: import.meta.env.VITE_SPRING_ADMIN_API,
+    auth: {
+      base: '/api/v1/auth',
+      signin: '/api/v1/auth/signin',
+      signup: '/api/v1/auth/signup',
+      refresh: '/api/v1/auth/refresh',
+    },
+    cryptoWallet: {
+      base: '/api/v1/crypto-wallet',
+      create: '/api/v1/crypto-wallet/create',
+      deposit: '/api/v1/crypto-wallet/deposit',
+      balances: '/api/v1/crypto-wallet/balances',
+      ids: '/api/v1/crypto-wallet/ids',
+      transactions: '/api/v1/crypto-wallet/transactions',
+      withdraw: '/api/v1/crypto-wallet/withdraw',
+    },
+    trading: {
+      base: '/api/v1/trading',
+      orders: '/api/v1/trading/orders',
+      trades: '/api/v1/trading/trades',
+      marketData: '/api/v1/trading/market-data',
+    },
+    user: {
+      base: '/api/v1/user',
+      profile: '/api/v1/user/profile',
+      settings: '/api/v1/user/settings',
+    },
+    admin: {
+      base: '/api/v1/admin',
+      users: '/api/v1/admin/users',
+      system: '/api/v1/admin/system',
+    },
+  },
+  versions: {
+    v1: 'v1',
   },
 }
