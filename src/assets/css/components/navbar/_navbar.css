@@ -61,7 +61,9 @@
 }
 
 .menu-item {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   color: white;
   text-decoration: none;
   padding: 15px 20px;
@@ -70,6 +72,11 @@
 
 .menu-item:hover {
   background-color: #2d2e72;
+}
+
+.menu-icon {
+  width: 20px;
+  height: 20px;
 }
 
 .navbar-end {
@@ -139,6 +146,33 @@
 
 .logout-button:hover {
   background-color: #333;
+}
+
+.menu-item-with-submenu {
+  position: relative;
+}
+
+.submenu-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: none;
+  border: none;
+  color: white;
+  margin: 0;
+  padding: 15px 20px;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.arrow {
+  margin-left: auto;
+  transition: transform 0.3s ease;
+}
+
+.arrow-down {
+  transform: rotate(90deg);
 }
 
 @media (max-width: 768px) {

@@ -11,10 +11,30 @@
 
     <!-- Hamburger Menu -->
     <div class="menu" :class="{ 'menu-active': isMenuOpen }">
-      <router-link to="/trades" class="menu-item" @click="closeMenu">Trades</router-link>
-      <router-link to="/orders" class="menu-item" @click="closeMenu">Orders</router-link>
-      <router-link to="/wallets" class="menu-item" @click="closeMenu">Wallets</router-link>
-      <router-link v-if="hasAdminRole" to="/users" class="menu-item" @click="closeMenu">Users</router-link>
+      <router-link to="/market" class="menu-item" @click="closeMenu">
+        <ChartBarIcon class="menu-icon" />
+        Market
+      </router-link>
+      <router-link to="/trades" class="menu-item" @click="closeMenu">
+        <ArrowsRightLeftIcon class="menu-icon" />
+        Trades
+      </router-link>
+      <router-link to="/orders" class="menu-item" @click="closeMenu">
+        <ClipboardDocumentListIcon class="menu-icon" />
+        Orders
+      </router-link>
+      <div class="menu-item-with-submenu">
+        <button class="menu-item submenu-toggle" @click="toggleWalletMenu">
+          <WalletIcon class="menu-icon" />
+          Wallets
+          <span class="arrow" :class="{ 'arrow-down': showWalletMenu }">▸</span>
+        </button>
+        <WalletMenu v-if="showWalletMenu" @close="closeMenu" />
+      </div>
+      <router-link v-if="hasAdminRole" to="/users" class="menu-item" @click="closeMenu">
+        <UsersIcon class="menu-icon" />
+        Users
+      </router-link>
     </div>
 
     <!-- Right side buttons -->
@@ -38,11 +58,25 @@
 <script setup>
 import { ref } from 'vue'
 import { useAuth0 } from '@auth0/auth0-vue'
-import { authService } from '../../services/auth/auth.service'
-import { permissionService } from '../../services/auth/permission.service'
+import { authService } from '../../../services/auth/auth.service'
+import { permissionService } from '../../../services/auth/permission.service'
+import WalletMenu from './WalletMenu.vue'
+import {
+  ChartBarIcon,
+  ArrowsRightLeftIcon,
+  ClipboardDocumentListIcon,
+  WalletIcon,
+  UsersIcon,
+} from '@heroicons/vue/24/outline'
 const { user, logout } = useAuth0()
 const isMenuOpen = ref(false)
 const isProfileOpen = ref(false)
+const showWalletMenu = ref(false)
+
+const toggleWalletMenu = (event) => {
+  event.stopPropagation()
+  showWalletMenu.value = !showWalletMenu.value
+}
 
 const hasAdminRole = async () => {
   try {
@@ -65,6 +99,7 @@ const toggleProfile = () => {
 
 const closeMenu = () => {
   isMenuOpen.value = false
+  showWalletMenu.value = false
 }
 
 const handleLogout = () => {

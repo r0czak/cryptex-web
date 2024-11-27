@@ -1,14 +1,18 @@
 <template>
   <div class="app">
-    <Navbar />
-    <div class="content">
+    <Navbar v-if="isAuthenticated" />
+    <div class="content" :class="{ 'no-navbar': !isAuthenticated }">
       <router-view></router-view>
     </div>
   </div>
 </template>
 
 <script setup>
-import Navbar from './components/common/MainNavbar.vue'
+import { computed } from 'vue'
+import Navbar from './components/common/navbar/MainNavbar.vue'
+import { authService } from './services/auth/auth.service'
+
+const isAuthenticated = computed(() => authService.getIsAuthenticated())
 </script>
 
 <style>
@@ -19,5 +23,9 @@ import Navbar from './components/common/MainNavbar.vue'
 .content {
   margin-top: 60px;
   padding: 20px;
+}
+
+.content.no-navbar {
+  margin-top: 0;
 }
 </style>
