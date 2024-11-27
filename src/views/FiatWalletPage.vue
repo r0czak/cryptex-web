@@ -1,10 +1,7 @@
 <template>
   <div class="wallet-page">
     <div class="header">
-      <h1>Crypto Wallets</h1>
-      <button @click="showCreateWalletPopup = true" class="create-wallet-btn">
-        Create New Wallet
-      </button>
+      <h1>Fiat Wallets</h1>
     </div>
 
     <div v-if="isLoading" class="loading">Loading wallet...</div>

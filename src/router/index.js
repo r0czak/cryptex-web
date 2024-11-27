@@ -37,7 +37,23 @@ const routes = [
   {
     path: '/crypto-wallets',
     name: 'CryptoWallets',
-    component: () => import('../views/WalletPage.vue'),
+    component: () => import('../views/CryptoWalletPage.vue'),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/crypto-wallets/:id',
+    name: 'CryptoWalletOverview',
+    component: () => import('../views/CryptoWalletOverviewPage.vue'),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/FIAT-wallets',
+    name: 'FiatWallets',
+    component: () => import('../views/FiatWalletPage.vue'),
     meta: {
       requiresAuth: true,
     },
@@ -45,7 +61,7 @@ const routes = [
   {
     path: '/trades',
     name: 'Trades',
-    component: () => import('../views/WalletPage.vue'),
+    component: () => import('../views/CryptoWalletPage.vue'),
     meta: {
       requiresAuth: true,
     },
@@ -53,7 +69,15 @@ const routes = [
   {
     path: '/orders',
     name: 'Orders',
-    component: () => import('../views/WalletPage.vue'),
+    component: () => import('../views/CryptoWalletPage.vue'),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/market',
+    name: 'Market',
+    component: () => import('../views/CryptoWalletPage.vue'),
     meta: {
       requiresAuth: true,
     },
@@ -61,7 +85,7 @@ const routes = [
   {
     path: '/users',
     name: 'Users',
-    component: () => import('../views/WalletPage.vue'),
+    component: () => import('../views/CryptoWalletPage.vue'),
     meta: {
       requiresAuth: true,
       permissions: ['write:admin_role'],

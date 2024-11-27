@@ -30,6 +30,10 @@ export const apiService = {
     signup: (userData) => apiClient.post(API_CONFIG.endpoints.auth.signup, userData),
     refresh: () => apiClient.post(API_CONFIG.endpoints.auth.refresh),
   },
+  cryptoMarket: {
+    getPrice: (symbol) =>
+      apiClient.get(API_CONFIG.endpoints.cryptoMarket.price, { params: { symbol } }),
+  },
   cryptoWallet: {
     create: (walletName) => apiClient.post(API_CONFIG.endpoints.cryptoWallet.create, walletName),
     getIds: () => apiClient.get(API_CONFIG.endpoints.cryptoWallet.ids),

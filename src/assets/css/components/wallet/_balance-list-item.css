@@ -13,25 +13,25 @@
   border-bottom: none;
 }
 
-.crypto-info {
+.balance-list-crypto-info {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
-.crypto-icon {
+.balance-list-crypto-icon {
   width: 32px;
   height: 32px;
 }
 
-.crypto-name {
+.balance-list-crypto-name {
   font-weight: bold;
   color: #fff;
   font-family: var(--font-mono);
 }
 
-.balance-amount {
+.balance-list-amount {
   color: #4caf50;
-  font-family: monospace;
+  font-family: var(--font-mono);
   font-size: 1.1rem;
 }

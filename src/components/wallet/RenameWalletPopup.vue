@@ -1,22 +1,23 @@
 <template>
-  <div v-if="isOpen" class="popup-overlay">
+  <div class="popup-overlay">
     <div class="popup-content">
-      <h2>Create New Wallet</h2>
+      <h2>Rename Wallet</h2>
       <form @submit.prevent="handleSubmit">
         <div class="form-group">
+          <label for="walletName">New Wallet Name:</label>
           <div class="input-wrapper">
             <input
               id="walletName"
-              v-model="walletName"
+              v-model="newWalletName"
               type="text"
               required
-              placeholder="Enter wallet name"
+              placeholder="Enter new wallet name"
               class="input-field"
             />
           </div>
         </div>
         <div class="button-group">
-          <button class="submit-button" type="submit">Create</button>
+          <button class="submit-button" type="submit">Rename</button>
           <button class="cancel-button" type="button" @click="$emit('close')">Cancel</button>
         </div>
       </form>
@@ -28,19 +29,23 @@
 import { ref } from 'vue'
 import { cryptoWalletService } from '../../services/crypto/cryptoWallet.service'
 
-const emit = defineEmits(['close', 'walletCreated'])
-const walletName = ref('')
+const props = defineProps({
+  walletName: {
+    type: String,
+    required: true,
+  },
+})
+
+const emit = defineEmits(['close', 'renamed'])
+const newWalletName = ref(props.walletName)
 
 const handleSubmit = async () => {
   try {
-    await cryptoWalletService.createWallet(walletName.value)
-    emit('walletCreated')
+    await cryptoWalletService.renameWallet(newWalletName.value)
+    emit('renamed', newWalletName.value)
     emit('close')
-    walletName.value = ''
   } catch (error) {
-    console.error('Error creating wallet:', error)
+    console.error('Error renaming wallet:', error)
   }
 }
 </script>
-
-<style scoped></style>

@@ -1,0 +1,37 @@
+.wallet-overview-page {
+  padding: 2rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.wallet-title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  color: #999;
+}
+
+.balances-section {
+  margin-top: 2rem;
+}
+
+.balances-section h2 {
+  margin-bottom: 1.5rem;
+}

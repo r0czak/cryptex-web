@@ -30,4 +30,18 @@ export const cryptoWalletService = {
       throw error
     }
   },
+
+  async deposit(cryptoWalletId, cryptocurrencyName, amount) {
+    try {
+      const response = await apiService.cryptoWallet.deposit(
+        cryptoWalletId,
+        cryptocurrencyName,
+        amount
+      )
+      return response.data
+    } catch (error) {
+      console.error('Error depositing:', error)
+      throw error
+    }
+  },
 }

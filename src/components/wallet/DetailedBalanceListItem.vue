@@ -1,15 +1,27 @@
 <template>
-  <div class="balance-list-item">
-    <div class="balance-list-crypto-info">
-      <img :src="getCryptoIcon" :alt="cryptocurrencyName" class="balance-list-crypto-icon" />
-      <span class="balance-list-crypto-name">{{ cryptocurrencyName }}</span>
+  <div class="detailed-balance-item">
+    <div class="crypto-info">
+      <img :src="getCryptoIcon" :alt="cryptocurrencyName" class="crypto-icon" />
+      <div class="crypto-details">
+        <span class="crypto-name">{{ cryptocurrencyName }}</span>
+        <div class="volume-info">
+          <span class="volume">{{ formatBalance(balance) }} {{ cryptocurrencyName }}</span>
+          <span class="price-per-unit">${{ formatBalance(pricePerUnit) }}/{{ cryptocurrencyName }}</span>
+        </div>
+      </div>
     </div>
-    <span class="balance-list-amount">{{ formatBalance(balance) }}</span>
+    <div class="balance-info">
+      <span class="dollar-balance">${{ formatBalance(totalInDollars) }}</span>
+      <span class="percentage" :class="{ positive: changePercentage > 0, negative: changePercentage < 0 }">
+        {{ changePercentage > 0 ? '+' : '' }}{{ changePercentage }}%
+      </span>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { computed } from 'vue'
+const totalInDollars = computed(() => props.balance * props.pricePerUnit)
 
 const props = defineProps({
   cryptocurrencyName: {
@@ -21,6 +33,14 @@ const props = defineProps({
     required: true,
   },
   balance: {
+    type: Number,
+    required: true,
+  },
+  pricePerUnit: {
+    type: Number,
+    required: true,
+  },
+  changePercentage: {
     type: Number,
     required: true,
   },

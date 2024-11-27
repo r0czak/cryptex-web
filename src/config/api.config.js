@@ -7,6 +7,10 @@ export const API_CONFIG = {
       signup: '/api/v1/auth/signup',
       refresh: '/api/v1/auth/refresh',
     },
+    cryptoMarket: {
+      base: '/api/v1/crypto-market',
+      price: '/api/v1/crypto-market/price',
+    },
     cryptoWallet: {
       base: '/api/v1/crypto-wallet',
       create: '/api/v1/crypto-wallet/create',
