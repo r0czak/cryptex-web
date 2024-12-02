@@ -1,5 +1,5 @@
 <template>
-  <div class="wallet-overview-page">
+  <div class="p-8">
     <div v-if="isLoading" class="loading">Loading wallet...</div>
 
     <div v-else-if="error" class="error">
@@ -7,20 +7,20 @@
     </div>
 
     <div v-else>
-      <div class="header">
-        <div class="wallet-title">
-          <h1>{{ wallet.walletName }}</h1>
-          <button class="icon-button" @click="showRenamePopup = true">
-            <PencilIcon class="icon" />
+      <div class="flex justify-between items-center mb-8">
+        <div class="flex items-center gap-4">
+          <h1 class="text-3xl font-bold">{{ wallet.walletName }}</h1>
+          <button class="btn btn-ghost" @click="showRenamePopup = true">
+            <PencilIcon class="w-5 h-5" />
           </button>
         </div>
-        <button class="basic-button" @click="showAddBalancePopup = true">Add Balance</button>
+        <button class="btn btn-primary" @click="showAddBalancePopup = true">Add Balance</button>
       </div>
 
       <WalletSummary :total-balance="totalBalance" />
 
-      <div class="balances-section">
-        <h2>Your Cryptocurrencies</h2>
+      <div class="mt-10">
+        <h2 class="text-xl font-bold mb-4">Your Cryptocurrencies</h2>
         <div class="balances-list">
           <DetailedBalanceListItem
             v-for="balance in wallet.balances"
@@ -37,14 +37,14 @@
 
     <Teleport to="body">
       <RenameWalletPopup
-        v-if="showRenamePopup"
+        :is-open="showRenamePopup"
         :wallet-name="wallet.walletName"
         @close="showRenamePopup = false"
         @renamed="handleWalletRenamed"
       />
 
       <AddBalancePopup
-        v-if="showAddBalancePopup"
+        :is-open="showAddBalancePopup"
         :crypto-wallet-id="wallet.cryptoWalletId"
         @close="showAddBalancePopup = false"
         @balance-added="handleBalanceAdded"
@@ -110,43 +110,3 @@ onMounted(() => {
   fetchWalletData()
 })
 </script>
-
-<style scoped>
-.wallet-overview-page {
-  padding: 2rem;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-}
-
-.wallet-title {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.icon-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.5rem;
-}
-
-.icon {
-  width: 20px;
-  height: 20px;
-  color: #999;
-}
-
-.balances-section {
-  margin-top: 2rem;
-}
-
-.balances-section h2 {
-  margin-bottom: 1.5rem;
-}
-</style>

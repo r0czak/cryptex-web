@@ -4,10 +4,12 @@
       <h1>Loading...</h1>
     </div>
     <div v-else>
-      <button class="basic-button" @click="callPublicApi">Call Public API</button>
-      <button class="basic-button" @click="callPrivateApi">Call Private API</button>
-      <button class="basic-button" @click="callAdminApi">Call Admin API</button>
-      <button class="basic-button" @click="handleLogout">Log out</button>
+      <div class="flex gap-2">
+        <button class="btn btn-primary" @click="callPublicApi">Call Public API</button>
+        <button class="btn btn-primary" @click="callPrivateApi">Call Private API</button>
+        <button class="btn btn-primary" @click="callAdminApi">Call Admin API</button>
+        <button class="btn btn-primary" @click="handleLogout">Log out</button>
+      </div>
       <div v-if="apiMessage" class="api-message">
         {{ apiMessage }}
       </div>

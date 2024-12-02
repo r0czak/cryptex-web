@@ -23,7 +23,7 @@ export const cryptoWalletService = {
 
   async createWallet(walletName) {
     try {
-      const response = await apiService.cryptoWallet.create(walletName)
+      const response = await apiService.cryptoWallet.create({ walletName })
       return response.data
     } catch (error) {
       console.error('Error creating wallet:', error)

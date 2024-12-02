@@ -1,52 +1,82 @@
 <template>
-  <div class="custom-select" :class="{ open: isOpen }">
-    <div class="selected" @click="toggleDropdown">
-      <div v-if="selectedOption" class="option-content">
+  <div class="dropdown w-full">
+    <label
+      tabindex="0"
+      class="input input-bordered w-full flex justify-between items-center"
+      @click="isOpen = !isOpen"
+    >
+      <div class="flex items-center gap-2">
         <img
+          v-if="selectedOption"
           :src="getCryptoIcon(selectedOption.value)"
-          :alt="selectedOption.label"
-          class="crypto-icon"
+          :alt="`${selectedOption.label} icon`"
+          class="w-5 h-5"
         />
-        <a>{{ selectedOption.label }}</a>
+        <span>{{ selectedOption ? selectedOption.label : 'Select cryptocurrency' }}</span>
       </div>
-      <div v-else class="placeholder">Select cryptocurrency</div>
-    </div>
-    <div v-if="isOpen" class="options">
-      <div
-        v-for="option in options"
-        :key="option.value"
-        class="option"
-        @click="selectOption(option)"
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        class="ml-2"
+        :class="{ 'rotate-180': isOpen }"
       >
-        <img :src="getCryptoIcon(option.value)" :alt="option.label" class="crypto-icon" />
-        <a>{{ option.label }}</a>
-      </div>
-    </div>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+      </svg>
+    </label>
+    <ul
+      tabindex="0"
+      class="dropdown-content z-50 menu p-2 shadow bg-base-200 rounded-box w-full"
+      :class="{ hidden: !isOpen }"
+    >
+      <li v-for="option in options" :key="option.value">
+        <a @click="selectOption(option)" class="flex items-center gap-2">
+          <img :src="getCryptoIcon(option.value)" :alt="`${option.label} icon`" class="w-5 h-5" />
+          {{ option.label }}
+        </a>
+      </li>
+    </ul>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
+
+const isOpen = ref(false)
 
 const props = defineProps({
   modelValue: String,
-  options: Array,
+  options: {
+    type: Array,
+    required: true,
+  },
 })
 
 const emit = defineEmits(['update:modelValue'])
-const isOpen = ref(false)
 
 const selectedOption = computed(() =>
   props.options.find((option) => option.value === props.modelValue)
 )
 
-const toggleDropdown = () => {
-  isOpen.value = !isOpen.value
-}
-
 const selectOption = (option) => {
   emit('update:modelValue', option.value)
   isOpen.value = false
+}
+
+const getCryptoIcon = (cryptoName) => {
+  try {
+    return new URL(
+      `../../assets/images/crypto/logos/${cryptoName.toLowerCase()}-${getSymbol(
+        cryptoName
+      )}-logo.svg`,
+      import.meta.url
+    ).href
+  } catch (error) {
+    return new URL(`../../assets/images/crypto/logos/bitcoin-btc-logo.svg`, import.meta.url).href
+  }
 }
 
 const getSymbol = (cryptoName) => {
@@ -57,80 +87,14 @@ const getSymbol = (cryptoName) => {
   }
   return symbolMap[cryptoName.toLowerCase()] || 'btc'
 }
-
-const getCryptoIcon = (cryptoName) => {
-  const iconName = cryptoName.toLowerCase()
-  try {
-    return new URL(
-      `../../assets/images/crypto/logos/${iconName}-${getSymbol(cryptoName)}-logo.svg`,
-      import.meta.url
-    ).href
-  } catch (error) {
-    return new URL(`../../assets/images/crypto/logos/bitcoin-btc-logo.svg`, import.meta.url).href
-  }
-}
 </script>
 
 <style scoped>
-.custom-select {
-  width: 100%;
-  position: relative;
+.dropdown-content {
+  z-index: 50;
 }
 
-.selected {
-  padding: 0.75rem;
-  border: 1px solid #3d3e82;
-  border-radius: 4px;
-  background: #1a1a1a;
-  color: white;
-  font-size: 0.9rem;
-  transition: border-color 0.2s;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  max-height: 16px;
-}
-
-.selected:hover {
-  border-color: #4a4aa3;
-}
-
-.options {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  right: 0;
-  background: #1a1a1a;
-  border: 1px solid #3d3e82;
-  border-radius: 4px;
-  z-index: 1000;
-}
-
-.option {
-  padding: 0.75rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.option:hover {
-  background: #2d2e72;
-}
-
-.crypto-icon {
-  width: 24px;
-  height: 24px;
-}
-
-.option-content {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.placeholder {
-  color: #666;
-  font-family: var(--font-mono);
+svg {
+  transition: transform 0.2s ease;
 }
 </style>

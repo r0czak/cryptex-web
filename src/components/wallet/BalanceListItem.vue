@@ -1,10 +1,10 @@
 <template>
-  <div class="balance-list-item">
-    <div class="balance-list-crypto-info">
-      <img :src="getCryptoIcon" :alt="cryptocurrencyName" class="balance-list-crypto-icon" />
-      <span class="balance-list-crypto-name">{{ cryptocurrencyName }}</span>
+  <div class="flex justify-between items-center bg-neutral p-3 m-2 rounded-xl">
+    <div class="flex items-center gap-4">
+      <img :src="getCryptoIcon" :alt="cryptocurrencyName" class="w-10 h-10" />
+      <span class="text-l font-bold">{{ cryptocurrencyName }}</span>
     </div>
-    <span class="balance-list-amount">{{ formatBalance(balance) }}</span>
+    <span class="text-l text-success">{{ formatBalance(balance) }}</span>
   </div>
 </template>
 

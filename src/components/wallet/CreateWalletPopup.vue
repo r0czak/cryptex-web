@@ -1,34 +1,41 @@
 <template>
-  <div v-if="isOpen" class="popup-overlay">
-    <div class="popup-content">
-      <h2>Create New Wallet</h2>
-      <form @submit.prevent="handleSubmit">
-        <div class="form-group">
-          <div class="input-wrapper">
-            <input
-              id="walletName"
-              v-model="walletName"
-              type="text"
-              required
-              placeholder="Enter wallet name"
-              class="input-field"
-            />
-          </div>
+  <dialog :class="{ 'modal modal-open': props.isOpen }" id="create_wallet_modal">
+    <div class="modal-box">
+      <h3 class="text-lg font-bold text-center">Create new wallet</h3>
+      <form @submit.prevent="handleSubmit" class="mt-4">
+        <div class="form-control w-full">
+          <input
+            v-model="walletName"
+            type="text"
+            placeholder="Enter wallet name"
+            class="input input-bordered w-full"
+            required
+          />
         </div>
-        <div class="button-group">
-          <button class="submit-button" type="submit">Create</button>
-          <button class="cancel-button" type="button" @click="$emit('close')">Cancel</button>
+        <div class="modal-action flex justify-center">
+          <button class="btn btn-success" type="submit">Create</button>
+          <button class="btn btn-error" type="button" @click="$emit('close')">Cancel</button>
         </div>
       </form>
     </div>
-  </div>
+    <form method="dialog" class="modal-backdrop">
+      <button @click="$emit('close')">close</button>
+    </form>
+  </dialog>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { cryptoWalletService } from '../../services/crypto/cryptoWallet.service'
 
-const emit = defineEmits(['close', 'walletCreated'])
+const props = defineProps({
+  isOpen: {
+    type: Boolean,
+    required: true,
+  },
+})
+
+const emit = defineEmits(['close', 'wallet-created'])
 const walletName = ref('')
 
 const handleSubmit = async () => {
@@ -42,5 +49,3 @@ const handleSubmit = async () => {
   }
 }
 </script>
-
-<style scoped></style>

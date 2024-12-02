@@ -1,58 +1,107 @@
 <template>
-  <nav class="navbar">
-    <div class="navbar-brand">
-      <button class="hamburger" @click="toggleMenu" aria-label="Toggle menu">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-      <router-link to="/" class="logo">Cryptex</router-link>
-    </div>
-
-    <!-- Hamburger Menu -->
-    <div class="menu" :class="{ 'menu-active': isMenuOpen }">
-      <router-link to="/market" class="menu-item" @click="closeMenu">
-        <ChartBarIcon class="menu-icon" />
-        Market
-      </router-link>
-      <router-link to="/trades" class="menu-item" @click="closeMenu">
-        <ArrowsRightLeftIcon class="menu-icon" />
-        Trades
-      </router-link>
-      <router-link to="/orders" class="menu-item" @click="closeMenu">
-        <ClipboardDocumentListIcon class="menu-icon" />
-        Orders
-      </router-link>
-      <div class="menu-item-with-submenu">
-        <button class="menu-item submenu-toggle" @click="toggleWalletMenu">
-          <WalletIcon class="menu-icon" />
-          Wallets
-          <span class="arrow" :class="{ 'arrow-down': showWalletMenu }">▸</span>
-        </button>
-        <WalletMenu v-if="showWalletMenu" @close="closeMenu" />
-      </div>
-      <router-link v-if="hasAdminRole" to="/users" class="menu-item" @click="closeMenu">
-        <UsersIcon class="menu-icon" />
-        Users
-      </router-link>
-    </div>
-
-    <!-- Right side buttons -->
-    <div class="navbar-end">
-      <div class="profile-dropdown" v-if="user">
-        <button class="profile-button" @click="toggleProfile">
-          <img :src="user.picture" :alt="user.name" class="avatar" />
-        </button>
-        <div class="dropdown-content" :class="{ show: isProfileOpen }">
-          <div class="user-info">
-            <p class="user-name">{{ user.name }}</p>
-            <p class="user-email">{{ user.email }}</p>
-          </div>
-          <button class="logout-button" @click="handleLogout">Logout</button>
+  <div class="navbar bg-base-200 fixed top-0 w-full z-50">
+    <div class="navbar-start">
+      <div class="drawer">
+        <input id="my-drawer" type="checkbox" class="drawer-toggle" v-model="isMenuOpen" />
+        <div class="drawer-content">
+          <label for="my-drawer" class="btn btn-ghost drawer-button">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h7"
+              />
+            </svg>
+          </label>
+        </div>
+        <div class="drawer-side">
+          <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+          <ul class="menu bg-base-200 text-base-content h-full w-80 p-4">
+            <li>
+              <router-link to="/market" @click="closeMenu">
+                <ChartBarIcon class="h-5 w-5" />
+                Market
+              </router-link>
+            </li>
+            <li>
+              <router-link to="/trades" @click="closeMenu">
+                <ArrowsRightLeftIcon class="h-5 w-5" />
+                Trades
+              </router-link>
+            </li>
+            <li>
+              <router-link to="/orders" @click="closeMenu">
+                <ClipboardDocumentListIcon class="h-5 w-5" />
+                Orders
+              </router-link>
+            </li>
+            <li>
+              <details>
+                <summary>
+                  <WalletIcon class="h-5 w-5" />
+                  Wallets
+                </summary>
+                <ul>
+                  <li>
+                    <router-link to="/crypto-wallets" @click="closeMenu">
+                      Crypto Wallets
+                    </router-link>
+                  </li>
+                  <li>
+                    <router-link to="/fiat-wallets" @click="closeMenu"> FIAT Wallets </router-link>
+                  </li>
+                </ul>
+              </details>
+            </li>
+            <li v-if="hasAdminRole">
+              <router-link to="/users" @click="closeMenu">
+                <UsersIcon class="h-5 w-5" />
+                Users
+              </router-link>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
-  </nav>
+
+    <div class="navbar-center">
+      <router-link to="/" class="btn btn-ghost text-xl">Cryptex</router-link>
+    </div>
+
+    <div class="navbar-end">
+      <div class="dropdown dropdown-end" v-if="user">
+        <div
+          tabindex="0"
+          role="button"
+          class="btn btn-ghost btn-circle avatar"
+          @click="toggleProfile"
+        >
+          <div class="w-10 rounded-full">
+            <img :src="user.picture" :alt="user.name" />
+          </div>
+        </div>
+        <ul
+          tabindex="0"
+          class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
+          :class="{ hidden: !isProfileOpen }"
+        >
+          <li class="disabled">
+            <a class="justify-between">
+              {{ user.name }}
+            </a>
+          </li>
+          <li><a class="btn btn-outline btn-error" @click="handleLogout">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -60,7 +109,6 @@ import { ref } from 'vue'
 import { useAuth0 } from '@auth0/auth0-vue'
 import { authService } from '../../../services/auth/auth.service'
 import { permissionService } from '../../../services/auth/permission.service'
-import WalletMenu from './WalletMenu.vue'
 import {
   ChartBarIcon,
   ArrowsRightLeftIcon,
@@ -68,15 +116,10 @@ import {
   WalletIcon,
   UsersIcon,
 } from '@heroicons/vue/24/outline'
+
 const { user, logout } = useAuth0()
 const isMenuOpen = ref(false)
 const isProfileOpen = ref(false)
-const showWalletMenu = ref(false)
-
-const toggleWalletMenu = (event) => {
-  event.stopPropagation()
-  showWalletMenu.value = !showWalletMenu.value
-}
 
 const hasAdminRole = async () => {
   try {
@@ -87,11 +130,6 @@ const hasAdminRole = async () => {
   }
 }
 
-const toggleMenu = () => {
-  isMenuOpen.value = !isMenuOpen.value
-  if (isMenuOpen.value) isProfileOpen.value = false
-}
-
 const toggleProfile = () => {
   isProfileOpen.value = !isProfileOpen.value
   if (isProfileOpen.value) isMenuOpen.value = false
@@ -99,7 +137,6 @@ const toggleProfile = () => {
 
 const closeMenu = () => {
   isMenuOpen.value = false
-  showWalletMenu.value = false
 }
 
 const handleLogout = () => {

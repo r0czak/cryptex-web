@@ -1,33 +1,31 @@
 <template>
-  <div class="popup-overlay">
-    <div class="popup-content">
-      <h2>Add Balance</h2>
-      <form @submit.prevent="handleSubmit">
-        <div class="form-group">
-          <div class="input-wrapper">
-            <CustomSelect v-model="selectedCrypto" :options="cryptocurrencies" />
-          </div>
+  <dialog :class="{ 'modal modal-open': props.isOpen }" id="add_balance_modal">
+    <div class="modal-box">
+      <h3 class="text-lg font-bold text-center">Add Balance</h3>
+      <form @submit.prevent="handleSubmit" class="mt-4">
+        <div class="form-control w-full mb-4">
+          <CustomSelect v-model="selectedCrypto" :options="cryptocurrencies" />
         </div>
-        <div class="form-group">
-          <div class="input-wrapper">
-            <input
-              id="amount"
-              v-model="displayAmount"
-              type="text"
-              required
-              @input="handleAmountInput"
-              placeholder="Enter amount"
-              class="input-field"
-            />
-          </div>
+        <div class="form-control w-full">
+          <input
+            v-model="displayAmount"
+            type="text"
+            placeholder="Enter amount"
+            class="input input-bordered w-full"
+            required
+            @input="handleAmountInput"
+          />
         </div>
-        <div class="button-group">
-          <button class="cancel-button" type="button" @click="$emit('close')">Cancel</button>
-          <button class="submit-button" type="submit">Add</button>
+        <div class="modal-action flex justify-center">
+          <button class="btn btn-success" type="submit">Add</button>
+          <button class="btn btn-error" type="button" @click="$emit('close')">Cancel</button>
         </div>
       </form>
     </div>
-  </div>
+    <form method="dialog" class="modal-backdrop">
+      <button @click="$emit('close')">close</button>
+    </form>
+  </dialog>
 </template>
 
 <script setup>
@@ -38,6 +36,10 @@ import CustomSelect from '../common/CustomSelect.vue'
 const props = defineProps({
   cryptoWalletId: {
     type: Number,
+    required: true,
+  },
+  isOpen: {
+    type: Boolean,
     required: true,
   },
 })
@@ -55,7 +57,6 @@ const cryptocurrencies = [
 
 const handleAmountInput = (event) => {
   const value = event.target.value
-  // Allow only numbers and decimal point
   if (/^\d*\.?\d*$/.test(value)) {
     displayAmount.value = value
     amount.value = parseFloat(value) || 0
