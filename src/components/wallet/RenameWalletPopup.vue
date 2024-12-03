@@ -1,28 +1,27 @@
 <template>
-  <div class="popup-overlay">
-    <div class="popup-content">
-      <h2>Rename Wallet</h2>
-      <form @submit.prevent="handleSubmit">
-        <div class="form-group">
-          <label for="walletName">New Wallet Name:</label>
-          <div class="input-wrapper">
-            <input
-              id="walletName"
-              v-model="newWalletName"
-              type="text"
-              required
-              placeholder="Enter new wallet name"
-              class="input-field"
-            />
-          </div>
+  <dialog :class="{ 'modal modal-open': props.isOpen }" id="rename_wallet_modal">
+    <div class="modal-box">
+      <h3 class="text-lg font-bold text-center">Rename Wallet</h3>
+      <form @submit.prevent="handleSubmit" class="mt-4">
+        <div class="form-control w-full">
+          <input
+            v-model="newWalletName"
+            type="text"
+            placeholder="Enter new wallet name"
+            class="input input-bordered w-full"
+            required
+          />
         </div>
-        <div class="button-group">
-          <button class="submit-button" type="submit">Rename</button>
-          <button class="cancel-button" type="button" @click="$emit('close')">Cancel</button>
+        <div class="modal-action flex justify-center">
+          <button class="btn btn-success" type="submit">Rename</button>
+          <button class="btn btn-error" type="button" @click="$emit('close')">Cancel</button>
         </div>
       </form>
     </div>
-  </div>
+    <form method="dialog" class="modal-backdrop">
+      <button @click="$emit('close')">close</button>
+    </form>
+  </dialog>
 </template>
 
 <script setup>
@@ -34,6 +33,14 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  cryptoWalletId: {
+    type: String,
+    required: true,
+  },
+  isOpen: {
+    type: Boolean,
+    required: true,
+  },
 })
 
 const emit = defineEmits(['close', 'renamed'])
@@ -41,7 +48,7 @@ const newWalletName = ref(props.walletName)
 
 const handleSubmit = async () => {
   try {
-    await cryptoWalletService.renameWallet(newWalletName.value)
+    await cryptoWalletService.renameWallet(props.cryptoWalletId, newWalletName.value)
     emit('renamed', newWalletName.value)
     emit('close')
   } catch (error) {

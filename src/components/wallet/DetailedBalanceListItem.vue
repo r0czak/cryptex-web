@@ -1,20 +1,29 @@
 <template>
-  <div class="detailed-balance-item">
-    <div class="crypto-info">
-      <img :src="getCryptoIcon" :alt="cryptocurrencyName" class="crypto-icon" />
-      <div class="crypto-details">
-        <span class="crypto-name">{{ cryptocurrencyName }}</span>
-        <div class="volume-info">
-          <span class="volume">{{ formatBalance(balance) }} {{ cryptocurrencyName }}</span>
-          <span class="price-per-unit">${{ formatBalance(pricePerUnit) }}/{{ cryptocurrencyName }}</span>
+  <div class="card bg-base-200 mb-4">
+    <div class="card-body p-6 flex-row justify-between items-center">
+      <div class="flex items-center gap-4">
+        <img :src="getCryptoIcon" :alt="cryptocurrencyName" class="w-10 h-10" />
+        <div class="flex flex-col gap-1">
+          <span class="font-mono text-lg font-bold">{{ cryptocurrencyName }}</span>
+          <div class="flex flex-col text-sm opacity-80">
+            <span>{{ formatBalance(balance) }} {{ cryptocurrencyName }}</span>
+            <span>${{ formatBalance(pricePerUnit) }}/{{ cryptocurrencyName }}</span>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="balance-info">
-      <span class="dollar-balance">${{ formatBalance(totalInDollars) }}</span>
-      <span class="percentage" :class="{ positive: changePercentage > 0, negative: changePercentage < 0 }">
-        {{ changePercentage > 0 ? '+' : '' }}{{ changePercentage }}%
-      </span>
+      <div class="text-right">
+        <span class="block font-mono text-xl mb-1">${{ formatBalance(totalInDollars) }}</span>
+        <span
+          class="badge"
+          :class="{
+            'badge-success': changePercentage > 0,
+            'badge-error': changePercentage < 0,
+            'badge-ghost': changePercentage === 0,
+          }"
+        >
+          {{ changePercentage > 0 ? '+' : '' }}{{ changePercentage }}%
+        </span>
+      </div>
     </div>
   </div>
 </template>
