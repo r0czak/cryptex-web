@@ -39,10 +39,9 @@ export const apiService = {
     getIds: () => apiClient.get(API_CONFIG.endpoints.cryptoWallet.ids),
     getBalances: (walletIds) =>
       apiClient.post(API_CONFIG.endpoints.cryptoWallet.balances, walletIds),
-    getTransactions: (params) =>
-      apiClient.get(API_CONFIG.endpoints.cryptoWallet.transactions, { params }),
     deposit: (data) => apiClient.post(API_CONFIG.endpoints.cryptoWallet.deposit, data),
-    withdraw: (data) => apiClient.post(API_CONFIG.endpoints.cryptoWallet.withdraw, data),
+    rename: (data) => apiClient.post(API_CONFIG.endpoints.cryptoWallet.rename, data),
+    delete: (data) => apiClient.post(API_CONFIG.endpoints.cryptoWallet.delete, data),
   },
   trading: {
     getOrders: (params) => apiClient.get(API_CONFIG.endpoints.trading.orders, { params }),

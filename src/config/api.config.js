@@ -14,11 +14,11 @@ export const API_CONFIG = {
     cryptoWallet: {
       base: '/api/v1/crypto-wallet',
       create: '/api/v1/crypto-wallet/create',
+      rename: '/api/v1/crypto-wallet/rename',
+      delete: '/api/v1/crypto-wallet/delete',
       deposit: '/api/v1/crypto-wallet/deposit',
       balances: '/api/v1/crypto-wallet/balances',
       ids: '/api/v1/crypto-wallet/ids',
-      transactions: '/api/v1/crypto-wallet/transactions',
-      withdraw: '/api/v1/crypto-wallet/withdraw',
     },
     trading: {
       base: '/api/v1/trading',

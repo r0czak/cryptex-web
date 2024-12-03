@@ -33,6 +33,10 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  cryptoWalletId: {
+    type: String,
+    required: true,
+  },
   isOpen: {
     type: Boolean,
     required: true,
@@ -44,7 +48,7 @@ const newWalletName = ref(props.walletName)
 
 const handleSubmit = async () => {
   try {
-    await cryptoWalletService.renameWallet(newWalletName.value)
+    await cryptoWalletService.renameWallet(props.cryptoWalletId, newWalletName.value)
     emit('renamed', newWalletName.value)
     emit('close')
   } catch (error) {

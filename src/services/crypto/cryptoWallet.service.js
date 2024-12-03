@@ -31,6 +31,26 @@ export const cryptoWalletService = {
     }
   },
 
+  async renameWallet(walletId, newName) {
+    try {
+      const response = await apiService.cryptoWallet.rename({ walletId, newName })
+      return response.data
+    } catch (error) {
+      console.error('Error renaming wallet:', error)
+      throw error
+    }
+  },
+
+  async deleteWallet(sourceWalletId, targetWalletId) {
+    try {
+      const response = await apiService.cryptoWallet.delete({ sourceWalletId, targetWalletId })
+      return response.data
+    } catch (error) {
+      console.error('Error deleting wallet:', error)
+      throw error
+    }
+  },
+
   async deposit(cryptoWalletId, cryptocurrencyName, amount) {
     try {
       const response = await apiService.cryptoWallet.deposit(
