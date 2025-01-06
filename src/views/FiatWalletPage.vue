@@ -1,64 +1,89 @@
 <template>
-  <div class="wallet-page">
-    <div class="header">
-      <h1>Fiat Wallets</h1>
+  <div class="p-8">
+    <div v-if="isLoading" class="flex justify-center items-center min-h-[400px]">
+      <span class="loading loading-spinner loading-lg text-primary"></span>
     </div>
-
-    <div v-if="isLoading" class="loading">Loading wallet...</div>
 
     <div v-else-if="error" class="error">
       <ErrorMessage title="Failed to load wallet" :message="error" :retryAction="fetchWalletData" />
     </div>
 
-    <div v-else class="wallet-container">
-      <div class="wallet-card" v-for="wallet in walletData" :key="wallet.cryptoWalletId">
-        <h3 class="wallet-name">{{ wallet.walletName }}</h3>
+    <div v-else>
+      <div class="flex justify-between items-center mb-8">
+        <div class="flex items-center gap-4">
+          <h1 class="text-3xl font-bold">FIAT Wallet</h1>
+        </div>
+        <ControlContainer horizontal>
+          <button class="btn btn-primary" @click="showAddBalancePopup = true">Add Balance</button>
+        </ControlContainer>
+      </div>
+
+      <WalletSummary :total-balance="totalBalance" />
+
+      <div class="mt-10">
+        <h2 class="text-xl font-bold mb-4">Your FIAT Currencies</h2>
         <div class="balances-list">
-          <BalanceListItem v-for="balance in wallet.balances" :key="balance.cryptocurrency"
-            :cryptocurrency="balance.cryptocurrency" :balance="balance.balance" />
+          <DetailedFIATBalanceListItem
+            v-for="balance in wallet.balances"
+            :key="balance.fiatCurrencyName"
+            :currency-name="balance.fiatCurrencyName"
+            :currency-symbol="balance.fiatCurrencySymbol"
+            :balance="balance.balance"
+          />
         </div>
       </div>
     </div>
 
-    <CreateWalletPopup :is-open="showCreateWalletPopup" @close="showCreateWalletPopup = false"
-      @wallet-created="handleWalletCreated" />
+    <Teleport to="body">
+      <AddFIATBalancePopup
+        :is-open="showAddBalancePopup"
+        :fiat-wallet-id="wallet?.fiatWalletId || 0"
+        @close="showAddBalancePopup = false"
+        @balance-added="handleWalletChanged"
+      />
+    </Teleport>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { cryptoWalletService } from '../services/crypto/cryptoWallet.service'
-import ErrorMessage from '../components/common/ErrorMessage.vue'
-import BalanceListItem from '../components/wallet/BalanceListItem.vue'
-import CreateWalletPopup from '../components/wallet/CreateWalletPopup.vue'
+import { ref, onMounted, computed } from 'vue'
+import { fiatWalletService } from '../services/fiat/fiatWallet.service'
 
-const walletData = ref([])
+import AddFIATBalancePopup from '../components/wallet/AddFIATBalancePopup.vue'
+import WalletSummary from '../components/wallet/WalletSummary.vue'
+import DetailedFIATBalanceListItem from '../components/wallet/DetailedFIATBalanceListItem.vue'
+import ErrorMessage from '../components/common/ErrorMessage.vue'
+import ControlContainer from '../components/common/controls/container/ControlContainer.vue'
+
+const wallet = ref({})
 const isLoading = ref(true)
 const error = ref(null)
-const showCreateWalletPopup = ref(false)
+const showAddBalancePopup = ref(false)
 
 const fetchWalletData = async () => {
   isLoading.value = true
   error.value = null
 
   try {
-    const walletIds = await cryptoWalletService.getWalletIds()
+    const walletIds = await fiatWalletService.getWalletIds()
     if (Array.isArray(walletIds) && walletIds.length > 0) {
-      const response = await cryptoWalletService.getWalletBalances(walletIds)
-      walletData.value = response.wallets
-    } else {
-      walletData.value = []
+      const response = await fiatWalletService.getWalletBalances(walletIds)
+      wallet.value = response.wallet // We only need the first wallet as there's only one FIAT wallet
     }
   } catch (err) {
-    error.value = err.message || 'Failed to fetch wallet data'
+    error.value = err.message || 'Failed to fetch wallet details'
   } finally {
     isLoading.value = false
   }
 }
 
-const handleWalletCreated = () => {
+const handleWalletChanged = () => {
   fetchWalletData()
 }
+
+const totalBalance = computed(() => {
+  return wallet.value?.balances?.reduce((sum, balance) => sum + balance.balance, 0) || 0
+})
 
 onMounted(() => {
   fetchWalletData()

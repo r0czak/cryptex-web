@@ -43,6 +43,11 @@ export const apiService = {
     rename: (data) => apiClient.post(API_CONFIG.endpoints.cryptoWallet.rename, data),
     delete: (data) => apiClient.post(API_CONFIG.endpoints.cryptoWallet.delete, data),
   },
+  fiatWallet: {
+    getIds: () => apiClient.get(API_CONFIG.endpoints.fiatWallet.ids),
+    getBalances: (walletIds) => apiClient.post(API_CONFIG.endpoints.fiatWallet.balances, walletIds),
+    deposit: (data) => apiClient.post(API_CONFIG.endpoints.fiatWallet.deposit, data),
+  },
   trading: {
     getOrders: (params) => apiClient.get(API_CONFIG.endpoints.trading.orders, { params }),
     getTrades: (params) => apiClient.get(API_CONFIG.endpoints.trading.trades, { params }),

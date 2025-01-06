@@ -15,7 +15,9 @@
           </button>
         </div>
         <ControlContainer horizontal>
-          <button class="btn btn-primary" @click="showAddBalancePopup = true">Add Balance</button>
+          <button class="btn btn-primary" @click="showAddCryptoBalancePopup = true">
+            Add Balance
+          </button>
           <button class="btn btn-error" @click="showDeletePopup = true">Delete Wallet</button>
         </ControlContainer>
       </div>
@@ -38,26 +40,26 @@
       </div>
     </div>
 
-    <Teleport to="body">
+    <Teleport to="body" v-if="wallet.cryptoWalletId">
       <RenameWalletPopup
         :is-open="showRenamePopup"
-        :wallet-name="wallet.walletName"
+        :wallet-name="wallet.walletName || ''"
         :crypto-wallet-id="wallet.cryptoWalletId"
         @close="showRenamePopup = false"
         @renamed="handleWalletRenamed"
       />
 
-      <AddBalancePopup
-        :is-open="showAddBalancePopup"
+      <AddCryptoBalancePopup
+        :is-open="showAddCryptoBalancePopup"
         :crypto-wallet-id="wallet.cryptoWalletId"
-        @close="showAddBalancePopup = false"
+        @close="showAddCryptoBalancePopup = false"
         @balance-added="handleWalletChanged"
       />
 
       <DeleteWalletPopup
         :is-open="showDeletePopup"
         :crypto-wallet-id="wallet.cryptoWalletId"
-        :wallet-name="wallet.walletName"
+        :wallet-name="wallet.walletName || ''"
         @close="showDeletePopup = false"
         @wallet-deleted="handleWalletDeleted"
       />
@@ -74,7 +76,7 @@ import { cryptoPriceService } from '../services/crypto/cryptoPrice.service'
 
 import RenameWalletPopup from '../components/wallet/RenameWalletPopup.vue'
 import DeleteWalletPopup from '../components/wallet/DeleteWalletPopup.vue'
-import AddBalancePopup from '../components/wallet/AddBalancePopup.vue'
+import AddCryptoBalancePopup from '../components/wallet/AddCryptoBalancePopup.vue'
 import WalletSummary from '../components/wallet/WalletSummary.vue'
 import DetailedBalanceListItem from '../components/wallet/DetailedBalanceListItem.vue'
 import ErrorMessage from '../components/common/ErrorMessage.vue'
@@ -86,7 +88,7 @@ const wallet = ref({})
 const isLoading = ref(true)
 const error = ref(null)
 const showRenamePopup = ref(false)
-const showAddBalancePopup = ref(false)
+const showAddCryptoBalancePopup = ref(false)
 const showDeletePopup = ref(false)
 
 const fetchWalletData = async () => {
@@ -96,10 +98,25 @@ const fetchWalletData = async () => {
   try {
     const response = await cryptoWalletService.getWalletBalances([route.params.id])
     wallet.value = response.wallets[0]
+
+    // Initialize prices and percentages before making API calls
     for (const balance of wallet.value.balances) {
-      const response = await cryptoPriceService.getPrice(balance.cryptocurrencySymbol)
-      balance.pricePerUnit = response.calculatedPrice
+      balance.pricePerUnit = 0
+      balance.changePercentage = 0
     }
+
+    // Update prices asynchronously
+    await Promise.all(
+      wallet.value.balances.map(async (balance) => {
+        try {
+          const priceResponse = await cryptoPriceService.getPrice(balance.cryptocurrencySymbol)
+          balance.pricePerUnit = priceResponse.calculatedPrice || 0
+          balance.changePercentage = priceResponse.changePercentage || 0
+        } catch (err) {
+          console.error(`Failed to fetch price for ${balance.cryptocurrencySymbol}:`, err)
+        }
+      })
+    )
   } catch (err) {
     error.value = err.message || 'Failed to fetch wallet details'
   } finally {
