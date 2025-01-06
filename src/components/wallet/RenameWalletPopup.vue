@@ -32,10 +32,12 @@ const props = defineProps({
   walletName: {
     type: String,
     required: true,
+    default: '',
   },
   cryptoWalletId: {
-    type: String,
+    type: Number,
     required: true,
+    default: 0,
   },
   isOpen: {
     type: Boolean,

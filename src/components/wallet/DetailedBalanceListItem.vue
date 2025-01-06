@@ -30,14 +30,9 @@
 
 <script setup>
 import { computed } from 'vue'
-const totalInDollars = computed(() => props.balance * props.pricePerUnit)
 
 const props = defineProps({
   cryptocurrencyName: {
-    type: String,
-    required: true,
-  },
-  cryptocurrencySymbol: {
     type: String,
     required: true,
   },
@@ -48,12 +43,16 @@ const props = defineProps({
   pricePerUnit: {
     type: Number,
     required: true,
+    default: 0,
   },
   changePercentage: {
     type: Number,
     required: true,
+    default: 0,
   },
 })
+
+const totalInDollars = computed(() => props.balance * props.pricePerUnit)
 
 const getCryptoIcon = computed(() => {
   const iconName = props.cryptocurrencyName.toLowerCase()

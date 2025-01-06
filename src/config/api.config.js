@@ -20,6 +20,12 @@ export const API_CONFIG = {
       balances: '/api/v1/crypto-wallet/balances',
       ids: '/api/v1/crypto-wallet/ids',
     },
+    fiatWallet: {
+      base: '/api/v1/fiat-wallet',
+      ids: '/api/v1/fiat-wallet/ids',
+      balances: '/api/v1/fiat-wallet/balances',
+      deposit: '/api/v1/fiat-wallet/deposit',
+    },
     trading: {
       base: '/api/v1/trading',
       orders: '/api/v1/trading/orders',

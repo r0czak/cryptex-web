@@ -49,16 +49,18 @@ import { ref, onMounted } from 'vue'
 import { cryptoWalletService } from '../../services/crypto/cryptoWallet.service'
 
 const props = defineProps({
-  isOpen: {
-    type: Boolean,
-    required: true,
-  },
   walletName: {
     type: String,
     required: true,
+    default: '',
   },
   cryptoWalletId: {
-    type: String,
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  isOpen: {
+    type: Boolean,
     required: true,
   },
 })
