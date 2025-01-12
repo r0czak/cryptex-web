@@ -112,7 +112,8 @@ const handleSubmit = async () => {
       throw new Error('Please enter a valid amount')
     }
 
-    await cryptoWalletService.deposit(props.cryptoWalletId, selectedCrypto.value, amount.value)
+    console.log(props.cryptoWalletId, selectedCurrency.symbol, amount.value)
+    await cryptoWalletService.deposit(props.cryptoWalletId, selectedCurrency.symbol, amount.value)
     emit('balance-added')
     emit('close')
     selectedCrypto.value = ''
