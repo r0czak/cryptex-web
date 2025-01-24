@@ -42,6 +42,10 @@ export const API_CONFIG = {
       users: '/api/v1/admin/users',
       system: '/api/v1/admin/system',
     },
+    vwap: {
+      current: '/api/v1/vwap/current',
+      history: '/api/v1/vwap/history',
+    },
   },
   versions: {
     v1: 'v1',

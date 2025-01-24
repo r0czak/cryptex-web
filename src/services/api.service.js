@@ -63,4 +63,8 @@ export const apiService = {
     getUsers: (params) => apiClient.get(API_CONFIG.endpoints.admin.users, { params }),
     getSystemStatus: () => apiClient.get(API_CONFIG.endpoints.admin.system),
   },
+  vwap: {
+    getCurrent: (params) => apiClient.get(API_CONFIG.endpoints.vwap.current, { params }),
+    getHistory: (params) => apiClient.get(API_CONFIG.endpoints.vwap.history, { params }),
+  },
 }
