@@ -23,7 +23,7 @@
             </option>
           </select>
 
-          <div class="w-full sm:w-[400px]">
+          <div class="w-full sm:w-[320px]">
             <Datepicker
               v-model="dateTimeRange"
               :range="true"
@@ -61,7 +61,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 import { Line } from 'vue-chartjs'
 import {
   Chart as ChartJS,
@@ -94,10 +94,6 @@ const selectedInterval = ref(TimeInterval.FIFTEEN_MINUTES)
 const dateTimeRange = ref([new Date(new Date().setDate(new Date().getDate() - 1)), new Date()])
 const chartData = ref(null)
 const totalBalance = ref(0)
-
-const today = computed(() => {
-  return new Date().toISOString().split('T')[0]
-})
 
 const chartOptions = {
   responsive: true,
@@ -149,30 +145,40 @@ const presetDates = ref([
   { label: 'This year', value: [startOfYear(new Date()), endOfYear(new Date())] },
 ])
 
+const getLocalISOString = (date) => {
+  const offset = date.getTimezoneOffset()
+  const localDate = new Date(date.getTime() - offset * 60 * 1000)
+  return localDate.toISOString().slice(0, 19) // Remove milliseconds and Z
+}
+
 const fetchChartData = async () => {
   isLoading.value = true
   try {
-    const startDateTime = new Date(
-      `${dateTimeRange.value[0].toISOString().split('T')[0]}T${
-        dateTimeRange.value[0].toISOString().split('T')[1]
-      }`
-    )
-    const endDateTime = new Date(
-      `${dateTimeRange.value[1].toISOString().split('T')[0]}T${
-        dateTimeRange.value[1].toISOString().split('T')[1]
-      }`
-    )
+    console.log('Crypto balances:', props.cryptoBalances)
+    if (!props.cryptoBalances || props.cryptoBalances.length === 0) {
+      console.log('No crypto balances available')
+      return
+    }
 
     // Get VWAP history for each cryptocurrency in the wallet
     const vwapPromises = props.cryptoBalances.map(async (balance) => {
+      const intervalKey = Object.entries(TimeInterval).find(
+        ([_, value]) => value === selectedInterval.value
+      )?.[0]
+
+      console.log(
+        'Making API call for:',
+        balance.cryptocurrencySymbol,
+        'with interval:',
+        intervalKey
+      )
+
       const response = await vwapService.getVWAPHistory({
         cryptoSymbol: balance.cryptocurrencySymbol,
         fiatSymbol: 'USD',
-        startDate: startDateTime.toISOString().replace('Z', ''),
-        endDate: endDateTime.toISOString().replace('Z', ''),
-        interval: Object.entries(TimeInterval).find(
-          ([key, value]) => value === selectedInterval.value
-        )[0],
+        startDate: getLocalISOString(dateTimeRange.value[0]),
+        endDate: getLocalISOString(dateTimeRange.value[1]),
+        interval: intervalKey,
         page: 0,
         size: 100,
       })
@@ -219,11 +225,20 @@ const fetchChartData = async () => {
   }
 }
 
-watch([selectedInterval, dateTimeRange], () => {
-  if (dateTimeRange.value?.[0] && dateTimeRange.value?.[1]) {
-    fetchChartData()
-  }
-})
+watch(
+  [selectedInterval, dateTimeRange, () => props.cryptoBalances],
+  () => {
+    console.log('Watch triggered:', {
+      interval: selectedInterval.value,
+      dateRange: dateTimeRange.value,
+      balances: props.cryptoBalances,
+    })
+    if (dateTimeRange.value?.[0] && dateTimeRange.value?.[1] && props.cryptoBalances?.length > 0) {
+      fetchChartData()
+    }
+  },
+  { immediate: true }
+)
 
 const formatBalance = (value) => {
   return Number(value).toLocaleString(undefined, {
@@ -235,11 +250,11 @@ const formatBalance = (value) => {
 const calculateTotalBalance = async () => {
   try {
     const vwapPromises = props.cryptoBalances.map(async (balance) => {
-      const response = await vwapService.getCurrentVWAP(
-        balance.cryptocurrencySymbol,
-        'USD',
-        'FIFTEEN_MINUTES'
-      )
+      const response = await vwapService.getCurrentVWAP({
+        cryptoSymbol: balance.cryptocurrencySymbol,
+        fiatSymbol: 'USD',
+        interval: 'FIFTEEN_MINUTES',
+      })
       return balance.balance * response.vwap
     })
 
@@ -254,6 +269,7 @@ let balanceUpdateInterval
 
 onMounted(() => {
   calculateTotalBalance()
+  fetchChartData()
   balanceUpdateInterval = setInterval(calculateTotalBalance, 1 * 60 * 1000)
 })
 

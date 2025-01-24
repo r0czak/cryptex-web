@@ -6,15 +6,18 @@
         <div class="flex flex-col gap-1">
           <span class="font-mono text-lg font-bold">{{ cryptocurrencyName }}</span>
           <div class="flex flex-col text-sm opacity-80">
-            <span>{{ formatBalance(balance) }} {{ cryptocurrencyName }}</span>
-            <span>${{ formatBalance(pricePerUnit) }}/{{ cryptocurrencyName }}</span>
+            <span class="text-white">{{ formatBalance(balance) }} {{ cryptocurrencyName }}</span>
+            <span class="text-xs"
+              >${{ formatFiatBalance(pricePerUnit) }}/{{ cryptocurrencyName }}</span
+            >
           </div>
         </div>
       </div>
       <div class="text-right">
-        <span class="block font-mono text-xl mb-1">${{ formatBalance(totalInDollars) }}</span>
+        <span class="block font-mono text-xl mb-1">${{ formatFiatBalance(totalBalance) }}</span>
         <span
           class="badge"
+          v-if="changePercentage"
           :class="{
             'badge-success': changePercentage > 0,
             'badge-error': changePercentage < 0,
@@ -29,7 +32,8 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { vwapService } from '../../services/crypto/vwapHistory.service'
 
 const props = defineProps({
   cryptocurrencyName: {
@@ -40,28 +44,23 @@ const props = defineProps({
     type: Number,
     required: true,
   },
-  pricePerUnit: {
+  paidAmount: {
     type: Number,
     required: true,
-    default: 0,
-  },
-  changePercentage: {
-    type: Number,
-    required: true,
-    default: 0,
   },
 })
 
-const totalInDollars = computed(() => props.balance * props.pricePerUnit)
+const totalBalance = ref(0)
+const pricePerUnit = ref(0)
+const changePercentage = ref(0)
 
 const getCryptoIcon = computed(() => {
-  const iconName = props.cryptocurrencyName.toLowerCase()
   try {
     // Using dynamic import for SVG files
     return new URL(
-      `../../assets/images/crypto/logos/${iconName}-${getSymbol(
+      `../../assets/images/crypto/logos/${props.cryptocurrencyName.toLowerCase()}-${getSymbol(
         props.cryptocurrencyName
-      )}-logo.svg`,
+      ).toLowerCase()}-logo.svg`,
       import.meta.url
     ).href
   } catch (error) {
@@ -71,13 +70,52 @@ const getCryptoIcon = computed(() => {
   }
 })
 
-const getSymbol = (cryptoName) => {
-  const symbolMap = {
-    bitcoin: 'btc',
-    ethereum: 'eth',
-    litecoin: 'ltc',
+const formatFiatBalance = (value) => {
+  return Number(value).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
+}
+
+const calculateTotalBalance = async () => {
+  try {
+    const response = await vwapService.getCurrentVWAP({
+      cryptoSymbol: getSymbol(props.cryptocurrencyName),
+      fiatSymbol: 'USD',
+      interval: 'FIFTEEN_MINUTES',
+    })
+    pricePerUnit.value = response.vwap
+    totalBalance.value = props.balance * response.vwap
+    changePercentage.value = (
+      ((totalBalance.value - props.paidAmount) / props.paidAmount) *
+      100
+    ).toFixed(2)
+  } catch (error) {
+    console.error('Error calculating total balance:', error)
   }
-  return symbolMap[cryptoName.toLowerCase()] || 'btc'
+}
+
+let balanceUpdateInterval
+
+onMounted(() => {
+  calculateTotalBalance()
+  balanceUpdateInterval = setInterval(calculateTotalBalance, 1 * 60 * 1000)
+})
+
+onUnmounted(() => {
+  if (balanceUpdateInterval) {
+    clearInterval(balanceUpdateInterval)
+  }
+})
+
+const getSymbol = (cryptoName) => {
+  cryptoName = cryptoName.toLowerCase()
+  const symbolMap = {
+    bitcoin: 'BTC',
+    ethereum: 'ETH',
+    litecoin: 'LTC',
+  }
+  return symbolMap[cryptoName] || 'BTC'
 }
 
 const formatBalance = (value) => {

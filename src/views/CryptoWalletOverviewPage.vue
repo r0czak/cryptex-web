@@ -33,8 +33,7 @@
             :cryptocurrencyName="balance.cryptocurrencyName"
             :cryptocurrencySymbol="balance.cryptocurrencySymbol"
             :balance="balance.balance"
-            :price-per-unit="balance.pricePerUnit"
-            :change-percentage="balance.changePercentage"
+            :paid-amount="balance.paidAmount"
           />
         </div>
       </div>
@@ -68,11 +67,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { PencilIcon } from '@heroicons/vue/24/outline'
 import { cryptoWalletService } from '../services/crypto/cryptoWallet.service'
-import { cryptoPriceService } from '../services/crypto/cryptoPrice.service'
 
 import RenameWalletPopup from '../components/wallet/RenameWalletPopup.vue'
 import DeleteWalletPopup from '../components/wallet/DeleteWalletPopup.vue'
@@ -98,25 +96,6 @@ const fetchWalletData = async () => {
   try {
     const response = await cryptoWalletService.getWalletBalances([route.params.id])
     wallet.value = response.wallets[0]
-
-    // Initialize prices and percentages before making API calls
-    for (const balance of wallet.value.balances) {
-      balance.pricePerUnit = 0
-      balance.changePercentage = 0
-    }
-
-    // Update prices asynchronously
-    await Promise.all(
-      wallet.value.balances.map(async (balance) => {
-        try {
-          const priceResponse = await cryptoPriceService.getPrice(balance.cryptocurrencySymbol)
-          balance.pricePerUnit = priceResponse.calculatedPrice || 0
-          balance.changePercentage = priceResponse.changePercentage || 0
-        } catch (err) {
-          console.error(`Failed to fetch price for ${balance.cryptocurrencySymbol}:`, err)
-        }
-      })
-    )
   } catch (err) {
     error.value = err.message || 'Failed to fetch wallet details'
   } finally {
