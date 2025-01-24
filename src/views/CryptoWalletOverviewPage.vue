@@ -22,7 +22,7 @@
         </ControlContainer>
       </div>
 
-      <WalletSummary :total-balance="totalBalance" />
+      <WalletSummary :crypto-balances="wallet.balances" />
 
       <div class="mt-10">
         <h2 class="text-xl font-bold mb-4">Your Cryptocurrencies</h2>
@@ -135,14 +135,6 @@ const handleWalletChanged = () => {
 const handleWalletDeleted = () => {
   router.push('/crypto-wallets')
 }
-
-const totalBalance = computed(() => {
-  return (
-    wallet.value.balances?.reduce((sum, balance) => {
-      return sum + balance.balance * balance.pricePerUnit
-    }, 0) || 0
-  )
-})
 
 onMounted(() => {
   fetchWalletData()
