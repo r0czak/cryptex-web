@@ -91,6 +91,14 @@ const routes = [
       permissions: ['write:admin_role'],
     },
   },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: () => import('../views/user/UserProfilePage.vue'),
+    meta: {
+      requiresAuth: true,
+    },
+  },
 ]
 
 const router = createRouter({

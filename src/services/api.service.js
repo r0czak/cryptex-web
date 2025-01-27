@@ -29,6 +29,9 @@ export const apiService = {
     signin: (credentials) => apiClient.post(API_CONFIG.endpoints.auth.signin, credentials),
     signup: (userData) => apiClient.post(API_CONFIG.endpoints.auth.signup, userData),
     refresh: () => apiClient.post(API_CONFIG.endpoints.auth.refresh),
+    getApiKey: () => apiClient.get(API_CONFIG.endpoints.auth.apiKey),
+    generateApiKey: (data) => apiClient.post(API_CONFIG.endpoints.auth.generateApiKey, data),
+    revokeApiKey: () => apiClient.delete(API_CONFIG.endpoints.auth.revokeApiKey),
   },
   cryptoMarket: {
     getPrice: (symbol) =>
