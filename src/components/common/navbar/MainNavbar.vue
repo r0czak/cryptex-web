@@ -97,6 +97,11 @@
               {{ user.name }}
             </a>
           </li>
+          <li>
+            <router-link to="/profile" class="justify-between" @click="isProfileOpen = false">
+              Profile
+            </router-link>
+          </li>
           <li><a class="btn btn-outline btn-error" @click="handleLogout">Logout</a></li>
         </ul>
       </div>

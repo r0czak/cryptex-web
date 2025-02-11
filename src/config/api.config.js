@@ -5,11 +5,13 @@ export const API_CONFIG = {
       base: '/api/v1/auth',
       signin: '/api/v1/auth/signin',
       signup: '/api/v1/auth/signup',
+      apiKey: '/api/v1/auth/api-key/key',
+      generateApiKey: '/api/v1/auth/api-key/create',
+      revokeApiKey: '/api/v1/auth/api-key/delete',
       refresh: '/api/v1/auth/refresh',
     },
-    cryptoMarket: {
-      base: '/api/v1/crypto-market',
-      price: '/api/v1/crypto-market/price',
+    cryptocurrency: {
+      base: '/api/v1/cryptocurrency',
     },
     cryptoWallet: {
       base: '/api/v1/crypto-wallet',
@@ -26,11 +28,10 @@ export const API_CONFIG = {
       balances: '/api/v1/fiat-wallet/balances',
       deposit: '/api/v1/fiat-wallet/deposit',
     },
-    trading: {
-      base: '/api/v1/trading',
-      orders: '/api/v1/trading/orders',
-      trades: '/api/v1/trading/trades',
-      marketData: '/api/v1/trading/market-data',
+    market: {
+      placeOrder: '/api/v1/orderbook/place',
+      getBuyOrders: '/api/v1/orderbook/buys',
+      getSellOrders: '/api/v1/orderbook/sells',
     },
     user: {
       base: '/api/v1/user',

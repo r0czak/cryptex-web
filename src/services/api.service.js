@@ -11,7 +11,7 @@ const createApiClient = (baseURL = API_CONFIG.baseURL) => {
   })
 
   client.interceptors.request.use(async (config) => {
-    console.log(config)
+    // console.log(config)
     if (authService.getIsAuthenticated()) {
       const token = await authService.getToken()
       config.headers.Authorization = `Bearer ${token}`
@@ -29,10 +29,12 @@ export const apiService = {
     signin: (credentials) => apiClient.post(API_CONFIG.endpoints.auth.signin, credentials),
     signup: (userData) => apiClient.post(API_CONFIG.endpoints.auth.signup, userData),
     refresh: () => apiClient.post(API_CONFIG.endpoints.auth.refresh),
+    getApiKey: () => apiClient.get(API_CONFIG.endpoints.auth.apiKey),
+    generateApiKey: (data) => apiClient.post(API_CONFIG.endpoints.auth.generateApiKey, data),
+    revokeApiKey: () => apiClient.delete(API_CONFIG.endpoints.auth.revokeApiKey),
   },
-  cryptoMarket: {
-    getPrice: (symbol) =>
-      apiClient.get(API_CONFIG.endpoints.cryptoMarket.price, { params: { symbol } }),
+  cryptocurrency: {
+    getCryptocurrencies: () => apiClient.get(API_CONFIG.endpoints.cryptocurrency.base),
   },
   cryptoWallet: {
     create: (data) => apiClient.post(API_CONFIG.endpoints.cryptoWallet.create, data),
@@ -48,11 +50,10 @@ export const apiService = {
     getBalances: (walletIds) => apiClient.post(API_CONFIG.endpoints.fiatWallet.balances, walletIds),
     deposit: (data) => apiClient.post(API_CONFIG.endpoints.fiatWallet.deposit, data),
   },
-  trading: {
-    getOrders: (params) => apiClient.get(API_CONFIG.endpoints.trading.orders, { params }),
-    getTrades: (params) => apiClient.get(API_CONFIG.endpoints.trading.trades, { params }),
-    getMarketData: (symbol) =>
-      apiClient.get(`${API_CONFIG.endpoints.trading.marketData}/${symbol}`),
+  market: {
+    placeOrder: (data) => apiClient.post(API_CONFIG.endpoints.market.placeOrder, data),
+    getBuyOrders: (params) => apiClient.get(API_CONFIG.endpoints.market.getBuyOrders, { params }),
+    getSellOrders: (params) => apiClient.get(API_CONFIG.endpoints.market.getSellOrders, { params }),
   },
   user: {
     getProfile: () => apiClient.get(API_CONFIG.endpoints.user.profile),
