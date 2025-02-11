@@ -1,6 +1,17 @@
 import { apiService } from '../api.service'
 
 export const fiatWalletService = {
+  async getFiatWallets() {
+    try {
+      const ids = await this.getWalletIds()
+      const balances = await this.getWalletBalances(ids)
+      return balances
+    } catch (error) {
+      console.error('Error fetching fiat wallets:', error)
+      throw error
+    }
+  },
+
   async getWalletBalances(walletIds) {
     try {
       const response = await apiService.fiatWallet.getBalances(walletIds)

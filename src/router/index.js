@@ -77,7 +77,7 @@ const routes = [
   {
     path: '/market',
     name: 'Market',
-    component: () => import('../views/CryptoWalletPage.vue'),
+    component: () => import('../views/MarketPage.vue'),
     meta: {
       requiresAuth: true,
     },

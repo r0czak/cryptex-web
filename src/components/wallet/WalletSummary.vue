@@ -151,6 +151,17 @@ const getLocalISOString = (date) => {
   return localDate.toISOString().slice(0, 19) // Remove milliseconds and Z
 }
 
+const normalizeTimestamp = (timestamp) => {
+  const date = new Date(timestamp)
+  const seconds = date.getSeconds()
+  if (seconds >= 30) {
+    date.setMinutes(date.getMinutes() + 1)
+  }
+  date.setSeconds(0)
+  date.setMilliseconds(0)
+  return date.getTime()
+}
+
 const fetchChartData = async () => {
   isLoading.value = true
   try {
@@ -165,13 +176,6 @@ const fetchChartData = async () => {
       const intervalKey = Object.entries(TimeInterval).find(
         ([_, value]) => value === selectedInterval.value
       )?.[0]
-
-      console.log(
-        'Making API call for:',
-        balance.cryptocurrencySymbol,
-        'with interval:',
-        intervalKey
-      )
 
       const response = await vwapService.getVWAPHistory({
         cryptoSymbol: balance.cryptocurrencySymbol,
@@ -191,15 +195,22 @@ const fetchChartData = async () => {
 
     const vwapResults = await Promise.all(vwapPromises)
 
-    // Combine all timestamps from all cryptocurrencies
+    // Combine all normalized timestamps from all cryptocurrencies
     const allTimestamps = [
-      ...new Set(vwapResults.flatMap((result) => result.history.map((item) => item.timestamp))),
-    ].sort()
+      ...new Set(
+        vwapResults.flatMap((result) =>
+          result.history.map((item) => normalizeTimestamp(item.timestamp))
+        )
+      ),
+    ].sort((a, b) => a - b)
 
-    // Calculate total wallet value for each timestamp
+    // Calculate total wallet value for each normalized timestamp
     const totalValues = allTimestamps.map((timestamp) => {
       const totalValue = vwapResults.reduce((sum, crypto) => {
-        const priceData = crypto.history.find((item) => item.timestamp === timestamp)
+        // Find matching history based on normalized timestamp
+        const priceData = crypto.history.find(
+          (item) => normalizeTimestamp(item.timestamp) === timestamp
+        )
         if (priceData) {
           return sum + priceData.vwap * crypto.amount
         }
@@ -209,7 +220,9 @@ const fetchChartData = async () => {
     })
 
     chartData.value = {
-      labels: totalValues.map((item) => new Date(item.timestamp).toLocaleString()),
+      labels: totalValues.map((item) =>
+        getLocalISOString(new Date(item.timestamp)).toLocaleString()
+      ),
       datasets: [
         {
           borderColor: '#4ade80',
@@ -224,21 +237,6 @@ const fetchChartData = async () => {
     isLoading.value = false
   }
 }
-
-watch(
-  [selectedInterval, dateTimeRange, () => props.cryptoBalances],
-  () => {
-    console.log('Watch triggered:', {
-      interval: selectedInterval.value,
-      dateRange: dateTimeRange.value,
-      balances: props.cryptoBalances,
-    })
-    if (dateTimeRange.value?.[0] && dateTimeRange.value?.[1] && props.cryptoBalances?.length > 0) {
-      fetchChartData()
-    }
-  },
-  { immediate: true }
-)
 
 const formatBalance = (value) => {
   return Number(value).toLocaleString(undefined, {
@@ -265,12 +263,28 @@ const calculateTotalBalance = async () => {
   }
 }
 
+watch(
+  [selectedInterval, dateTimeRange, () => props.cryptoBalances],
+  () => {
+    console.log('Watch triggered:', {
+      interval: selectedInterval.value,
+      dateRange: dateTimeRange.value,
+      balances: props.cryptoBalances,
+    })
+    if (dateTimeRange.value?.[0] && dateTimeRange.value?.[1] && props.cryptoBalances?.length > 0) {
+      fetchChartData()
+      calculateTotalBalance()
+    }
+  },
+  { immediate: true }
+)
+
 let balanceUpdateInterval
 
 onMounted(() => {
-  calculateTotalBalance()
+  balanceUpdateInterval = setInterval(calculateTotalBalance, 1 * 15 * 1000)
   fetchChartData()
-  balanceUpdateInterval = setInterval(calculateTotalBalance, 1 * 60 * 1000)
+  calculateTotalBalance()
 })
 
 onUnmounted(() => {
